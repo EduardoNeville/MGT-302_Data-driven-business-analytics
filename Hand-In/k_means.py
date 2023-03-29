@@ -5,7 +5,7 @@ import scipy.io as sio
 def init_centers(data, K):
     np.random.seed(0)
     random_idx = np.random.permutation(data.shape[0])
-    centers = data[random_idx[:K]]
+    centers = data[random_idx[:K],]
     return centers
 
 def compute_distance(data, centers, K):
@@ -51,6 +51,11 @@ def elbow_method(data, centers, cluster_assignments, K):
 def main():
     mat = sio.loadmat('Q2-Dataset/kmeans.mat')
     data = mat['kmeans']
+
+    # k means with 4 clusters
+    centers, cluster_assignments = K_means(data, 4, 100)
+    plot_data(data, centers, cluster_assignments)
+
     K = 10
 
     #plot_data(data, centers, cluster_assignments)
@@ -59,6 +64,7 @@ def main():
     for i in range(1, K):
         centers, cluster_assignments = K_means(data, i, 100)
         J_s[i] = elbow_method(data, centers, cluster_assignments, i)
+
 
     plt.plot(range(1, K+1), J_s)
     plt.xlabel('Number of clusters')
