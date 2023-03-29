@@ -2,34 +2,32 @@ import numpy as np
 import scipy.io as sio
 import matplotlib.pyplot as plt
 
-def train(x, y, theta, alpha, num_iters):
+def loss(x, y, theta):
     """
-        Training the linear regression through a num_iterations
-    """
-    m = len(y)
-    J_hist = np.zeros((num_iters, 1))
-    for i in range(num_iters):
-        new_theta = theta - alpha * cost_function(x,y,theta)            
-        print(new_theta)
-        # When the error term is too small we stop doing more iterations as we have found a minima
-        if np.linalg.norm(new_theta - theta) < 1e-5:
-            return theta, J_hist
-        theta = new_theta
-        J_hist[i] = theta
-    return theta, J_hist
-
-def cost_function(x, y, theta):
-    """
-        the cost function is calculated here to find the new theta
+    # Loss is calculated here 
     """
     sum = 0
+    h = np.dot(theta.T, x)
     for x_i, y_i in zip(x, y):
-        h = np.dot(theta, np.linalg.norm(x_i))
-        sum = sum + (h - np.linalg.norm(y_i)) * np.linalg.norm(x_i)
-    return np.divide(sum, 2**np.size(x,0))
+        sum += (h - y_i)**2 
+    return np.divide(sum, 2)
+
+def gradient_descent(X, y, theta, alpha, num_iterations):
+    old_theta = theta
+    num_samples, num_features = X.shape
+    J_hist = np.zeros((num_iterations, 1))
+    for i in range(num_iterations):
+        gradient = loss(X, y, theta) 
+        print(gradient)
+        new_theta = old_theta - (alpha * gradient)
+        if np.linalg.norm(new_theta - old_theta) < 1e-5:
+            return new_theta, J_hist
+        old_theta = new_theta
+        J_hist[i] = new_theta
+    return new_theta, J_hist
 
 
-def plot_cost_func(J_hist, y):
+def plot_loss(J_hist):
     plt.plot(J_hist[0], label='alpha = 1e-2')
     #plt.plot(J_hist[1], label='alpha = 1e-3')
     #plt.plot(J_hist[2], label='alpha = 1e-4')
@@ -43,17 +41,17 @@ def main():
     mat = sio.loadmat('Q1-Dataset/weighttrain.mat')
     data = np.array(mat['x'])
     x = np.array(mat['x'])
-    norm_x = np.linalg.norm(x)
-    x = np.array(np.divide(x, norm_x))
+    x = np.array(np.divide(x, np.linalg.norm(x)))
     y = np.array(mat['y'])
 
-    theta = np.ones((5,))
+    theta = np.zeros(x.shape) 
     num_iters = 500
 
-    alpha = 1e-2
-    theta_1, J_hist_1 = train(norm_x, y, theta, alpha, num_iters)
-    print(f"theta_1: \n {theta_1}")
-    plot_cost_func([J_hist_1], y)
+    alpha = 1e-4
+
+    # add , J_hist_1
+    theta_1, J_hist_1 = gradient_descent(x, y, theta, alpha, num_iters)
+    #plot_loss(J_hist_1)
 
     """
     alpha = 1e-3
