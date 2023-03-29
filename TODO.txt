@@ -1,0 +1,8 @@
+TODO
+
+[ ] Gradient Descent
+[ ] Stochastic Gradient Descent
+[ ] Make kmeans pretty
+[ ] Check for the last plot in SV
+
+

@@ -49,7 +49,7 @@ def elbow_method(data, centers, cluster_assignments, K):
 
 
 def main():
-    mat = sio.loadmat('../Q2-Dataset/kmeans.mat')
+    mat = sio.loadmat('Q2-Dataset/kmeans.mat')
     data = mat['kmeans']
     K = 10
 
