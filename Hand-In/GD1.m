@@ -6,8 +6,8 @@ load("weighttrain.mat");
 for i = 1:5
     x(:,i) = ( x(:,i) - mean(x(:,i)) ) / std(x(:,i)); %#ok<SAGROW> 
 end
-N = 100;
-alphas = linspace(0.001,0,N);
+N = 20;
+alphas = linspace(0.001,0.1,N);
 
 for i = 1:N
 
@@ -80,3 +80,5 @@ function sum_ = cost_grad(X,Y,T)
     sum_ = sum_/(N);
 end
 
+
+%%

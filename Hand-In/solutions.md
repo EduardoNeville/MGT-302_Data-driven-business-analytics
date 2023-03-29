@@ -29,6 +29,20 @@ Therefore,
 $$
 \theta_j:=\theta_j-\frac{\alpha}{m} \sum_{i=1}^m\left[\left(h_\theta\left(x_i\right)-y_i\right) x_i\right]
 $$
+#### (b)
+Once implemented we find that the optimal value for $\alpha$ is around 0.01. A plot of the number of iterations and the cost as a function of $\alpha$  can be found in the images named 'GD1_AlphaVsCost.jpg' and 'GD1_AlphaVsIterrations.jpg'.
+
+#### (c)
+The plot of the cost as a function of thee number of iterations can be found in the image 'GD2_CostVsIterrations.jpg'. And the algorithm to find it is 'GD2.m'.
+#### (d)
+Once trained the $\Theta$ is found to be $\begin{bmatrix}
+22.29 \\
+4.68 \\
+2.31 \\
+-1.42 \\
+5.99 \\
+-8.24 \\
+\end{bmatrix}$ and the final cost is calculated to be 0.3124, calculated with the test data. The MATLAB for this is in file 'GD3.m'.
 
 ### Part 2
 #### (a)
@@ -82,7 +96,9 @@ giving us the following equation:
 $$
 \theta_j=\theta_j-\alpha\left(\widehat{y^i}-y^i\right) X_j^i
 $$
-
+The implementation of this can be found in the file 'SGD1.py'. When comparing the plots we can see that SGD converges much faster than GD.
+### (b)
+The step-size of SGD is now chosen as a decreasing sequence $\alpha_t =\frac{b}{1+t}$,  the implementation of this can be found in the file 'SGD2.py'. The parameter t was devided to make the sequence slower. As we can see in files 'SDG1_CostVsIterrations.png' and 'SDG2_CostVsIterrations.png' this algorithm converges faster.
 
 ## Question 2
 
