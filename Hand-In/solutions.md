@@ -96,7 +96,9 @@ giving us the following equation:
 $$
 \theta_j=\theta_j-\alpha\left(\widehat{y^i}-y^i\right) X_j^i
 $$
-
+The implementation of this can be found in the file 'SGD1.py'. When comparing the plots we can see that SGD converges much faster than GD.
+### (b)
+The step-size of SGD is now chosen as a decreasing sequence $\alpha_t =\frac{b}{1+t}$,  the implementation of this can be found in the file 'SGD2.py'. The parameter t was devided to make the sequence slower. As we can see in files 'SDG1_CostVsIterrations.png' and 'SDG2_CostVsIterrations.png' this algorithm converges faster.
 
 ## Question 2
 
