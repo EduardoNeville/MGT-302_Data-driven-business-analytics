@@ -3,6 +3,11 @@
 Eduardo Neville <br>
 SCIPER: 314667 <br>
 
+And
+
+Åke Janson <br>
+SCIPER: 314487 <br>
+
 ## Question 1:
 
 ### Part 1)
@@ -78,39 +83,47 @@ $$
 \theta_j=\theta_j-\alpha\left(\widehat{y^i}-y^i\right) X_j^i
 $$
 
+
 ## Question 2
 
 To find the first principal component of M, we need to follow these steps:
-
+* Standardize the data 
 * Compute the covariance matrix of M
 * Compute the eigenvalues and eigenvectors of the covariance matrix
 * Sort the eigenvalues in descending order and choose the eigenvector corresponding to the largest eigenvalue as the first principal component.
 Let's compute each step:
 
-We first need to find the covariance matrix, to do so we must first calculate the mean of each input data: <br>
-
+We need to start by standardizing the data. To do this we substract the mean of each input data and devide by the standard deviation. Let's start by calculating the mean vector $\mu$.
 $$
+\bar{a}=\frac{\sum_{i}^{N}a_i}{N}\\
 \bar{x}=(1+2+0)/3 = 1 \\
 \bar{y}=(2+1+0)/3 = 1 \\
 \bar{z}=(0+0+0)/3 = 0
-
 $$
 Giving us the mean vector: <br>
 $$
-\mu = \begin{bmatrix}1 & 1 & 0 \end{bmatrix}
+\mu = \begin{bmatrix}\bar{x} & \bar{y} & \bar{z} \end{bmatrix} = \begin{bmatrix}1 & 1 & 0 \end{bmatrix}
+$$
+Next we can calculate the standard deviation of each input data:
+$$
+\sigma_a = \sqrt{\frac{\sum_{i}^{N}(a_i-\bar{a})^2 }{N-1}}\\
+\sigma_x = \sqrt{\frac{(1-1)^2 + (2-1)^2 + (0-1)^2 }{3-1}} = \sqrt{\frac{2}{2}} = 1\\
+\sigma_y = \sqrt{\frac{(2-1)^2 + (1-1)^2 + (0-1)^2 }{3-1}} = \sqrt{\frac{2}{2}} = 1\\
+\sigma_z = \sqrt{\frac{(0-0)^2 + (0-0)^2 + (0-0)^2 }{3-1}} = \sqrt{\frac{0}{3}} = 0
 $$
 
-We then subtract the means from each column to center the data:
+We then subtract the means and substract by the standard deviation from each column to standardize the data:
 
 $$
+a_{standard} = \frac{a-\bar{a}}{\sigma_a}\\
 \begin{bmatrix}
-1 - 1 & 2 - 1 & 0 - 0 \\
-2 - 1 & 1 - 1 & 0 - 0 \\
-0 - 1 & 0 - 1 & 0 - 0 \\
+\frac{1 - 1}{1} & \frac{2 - 1}{1} & 0 \\
+\frac{2 - 1}{1} & \frac{1 - 1}{1} & 0 \\
+\frac{0 - 1}{1} & \frac{0 - 1}{1} & 0 \\
 \end{bmatrix}
 $$
 
-Giving us the following centered data matrix:
+Giving us the following standardized data matrix:
 
 $$
 X = 
@@ -122,15 +135,130 @@ X =
 $$
 
 Next, we compute the covariance matrix as follows 
+$$
+cov(a,b) = \frac{1}{N-1}\sum_{i=1}^{N}(a_i-\bar{a})(b_i-\bar{b})\\
+\Sigma = \begin{bmatrix}
+cov(x,x) & cov(x,y) & cov(x,z) \\
+cov(y,x) & cov(y,y) & cov(y,z) \\
+cov(z,x) & cov(z,y) & cov(z,z)
+\end{bmatrix} =  \frac{1}{N - 1} X^T * X 
+$$
 
-$$ \Sigma = \frac{1}{n - 1} X^T * X $$
-Where $\Sigma$ is the covariance matrix and $X$ is the centered data matrix. This gives us the following matrix:
-$$ \Sigma = 
-$\begin{bmatrix} 1 & -\frac{1}{2} & 0 \ -\frac{1}{2} & 1 & 0 \ 0 & 0 & 0 \end{bmatrix}$
-
+Where $\Sigma$ is the covariance matrix. This gives us the following matrix:
+$$ \Sigma = \frac{1}{2}
+ \begin{bmatrix} 
+0 & 1 & -1 \\ 
+1 & 0 & -1 \\ 
+0 & 0 & 0 \end{bmatrix}
 \begin{bmatrix}
-\frac{2}{3} & -\frac{2}{3} & 0 \\
--\frac{2}{3} & \frac{2}{3} & 0 \\
-0 & 0 & 0
-\end{bmatrix}
+0 & 1 & 0   \\
+1 & 0 & 0   \\
+-1 & -1 & 0 \\
+\end{bmatrix}=\frac{1}{2}
+\begin{bmatrix}
+2 & 1 & 0   \\
+1 & 2 & 0   \\
+0 & 0 & 0 \\
+\end{bmatrix}$$
 
+We should now compute the eigenvalues of the covariance matrix.
+
+
+$$
+det(\lambda-\Sigma) = \begin{bmatrix}
+\lambda-1 & -\frac{1}{2} & 0   \\
+-\frac{1}{2} & \lambda-1 & 0   \\
+0 & 0 & \lambda \\
+\end{bmatrix}=0
+$$
+which we can solve and get:
+$$
+\lambda(\lambda-\frac{1}{2})(\lambda-\frac{3}{2}) = 0
+$$
+So the eigenvalues of the covariant matrix are $\lambda_0=0$, $\lambda_1=\frac{1}{2}$ and $\lambda_2=\frac{3}{2}$.
+
+Let us now calculate the eigenvectors of each eigenvalue. for $\lambda_2 = \frac{3}{2}$:
+$$
+\frac{1}{2}
+\begin{bmatrix}
+2 & 1 & 0   \\
+1 & 2 & 0   \\
+0 & 0 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+a \\
+b \\
+c \\
+\end{bmatrix} = \frac{3}{2}\begin{bmatrix}
+a \\
+b \\
+c \\
+\end{bmatrix} 
+$$
+So we get that,
+$$
+\begin{matrix}
+a+\frac{1}{2}b=\frac{3}{2}a\\
+\frac{1}{2}a+b=\frac{3}{2}b \\
+0=c\\
+\end{matrix}\implies a=b \text{ and } c=0 \text{ .}
+$$
+for $\lambda_1 = \frac{1}{2}$:
+$$
+\frac{1}{2}
+\begin{bmatrix}
+2 & 1 & 0   \\
+1 & 2 & 0   \\
+0 & 0 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+a \\
+b \\
+c \\
+\end{bmatrix} = \frac{1}{2}\begin{bmatrix}
+a \\
+b \\
+c \\
+\end{bmatrix} 
+$$
+So we get that,
+$$
+\begin{matrix}
+a+\frac{1}{2}b=\frac{1}{2}a\\
+\frac{1}{2}a+b=\frac{1}{2}b \\
+0=c\\
+\end{matrix}\implies a=-b \text{ and } c=0 \text{ .}
+$$
+
+
+
+
+
+for $\lambda_0 = 0$:
+$$
+\frac{1}{2}
+\begin{bmatrix}
+2 & 1 & 0   \\
+1 & 2 & 0   \\
+0 & 0 & 0 \\
+\end{bmatrix}
+\begin{bmatrix}
+a \\
+b \\
+c \\
+\end{bmatrix} = 0 \begin{bmatrix}
+a \\
+b \\
+c \\
+\end{bmatrix} 
+$$
+So we get that,
+$$
+\begin{matrix}
+a+\frac{1}{2}b=0\\
+\frac{1}{2}a+b=0\\
+0=0\\
+\end{matrix}\implies a=-2 b \text{ and } c=1 \text{ .}
+$$
+So the eigenvectors for each eigenvalue are as follows, for $\lambda_2$ we get $v_2 = \begin{bmatrix}1 \\1 \\0 \\\end{bmatrix}$, for $\lambda_1$ we get $v_1 = \begin{bmatrix}1 \\-1 \\0 \\\end{bmatrix}$, and for $\lambda_0$ we get $v_0 = \begin{bmatrix}0 \\0 \\1 \\\end{bmatrix}$.
+So the the first and second principal components of M are $\begin{bmatrix}1 \\1 \\0 \\\end{bmatrix}$ and $\begin{bmatrix}1 \\-1 \\0 \\\end{bmatrix}$, since $\lambda_2 > \lambda_1 >\lambda_0$.
