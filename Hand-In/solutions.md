@@ -271,5 +271,6 @@ By randomizing the centers for every iterations until they converge into cluster
 
 ### 2.
 Solutions can be found in the file 'k_means.py'.
+
 ### 3.
 The cost function decreases as K increases because we are essentially fitting the data in more clusters, at the limit we will put every single data point in it's own small cluster, this will decrease the cost function until there is essentially no error. This is over fitting, because having only single point clusters does not have any statistical significance. 
