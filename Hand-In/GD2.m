@@ -6,19 +6,17 @@ load("weighttrain.mat");
 for i = 1:5
     x(:,i) = ( x(:,i) - mean(x(:,i)) ) / std(x(:,i)); %#ok<SAGROW> 
 end
-N = 100;
-alphas = linspace(0.001,0,N);
-
+N = 40;
+alpha = 0.01; %Optimal alpha
+Iterrations = 10:10:400;
 for i = 1:N
-
-    alpha = alphas(i);
 
     Theta = zeros(6,1)';
     Theta_old = Theta;
     Theta = Theta - alpha * cost_grad(x,y,Theta);
     Iterration = 1;
 
-    while not(all( abs(Theta-Theta_old ) < 1e-7 )) 
+    while true 
         
         Theta_old = Theta;
         Theta = Theta - alpha * cost_grad(x,y,Theta);
@@ -28,35 +26,22 @@ for i = 1:N
             disp(num2str(alpha) +" : NAN");
             break;
         end
-        if Iterration > 1e6
+        if Iterration > Iterrations(i)
             break;
         end
     end
     costs(i) = cost(x,y,Theta);
-    alphas(i) = alpha;
-    Iterrations(i) = Iterration;
-    disp(alpha);
+    disp(Iterrations(i));
 end
 %%
 fs = 25; lw = 2; ms = 15;
 
 figure('Name','alpha vs cost ');
-plot(alphas,costs,'r-',LineWidth=lw);
+plot(Iterrations,costs,'r-',LineWidth=lw);
 grid on;
-xlabel('$\alpha$',FontSize=fs,Interpreter='latex');
+xlabel('\# of Iterrations',FontSize=fs,Interpreter='latex');
 ylabel('Cost',FontSize=fs,Interpreter='latex');
-
-figure('Name','alpha vs Iterrations ');
-plot(alphas,Iterrations,'r-',LineWidth=lw);
-grid on;
-xlabel('$\alpha$',FontSize=fs,Interpreter='latex');
-ylabel('Iterrations',FontSize=fs,Interpreter='latex');
-
-
-%h = @(X,T) T(1) + sum(X.*T(1,2:6),2);
-%cost = @(X,Y,T) (1/2*length(Y)) * sum( (h(X,T)-Y).^2);
-%cost_gradient = @(X,Y,T) (1/length(Y)) * sum( [zeros(200,1)+1,X].*(h(X,T)-Y) );
-
+ylim([min(costs),max(costs)]);
 
 function result = h(X,T)
     result = T(1) + T(2)*X(1) + T(3)*X(2) + T(4)*X(3) + T(5)*X(4) + T(6)*X(5);
