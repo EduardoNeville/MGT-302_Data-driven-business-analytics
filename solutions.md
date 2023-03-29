@@ -262,3 +262,14 @@ a+\frac{1}{2}b=0\\
 $$
 So the eigenvectors for each eigenvalue are as follows, for $\lambda_2$ we get $v_2 = \begin{bmatrix}1 \\1 \\0 \\\end{bmatrix}$, for $\lambda_1$ we get $v_1 = \begin{bmatrix}1 \\-1 \\0 \\\end{bmatrix}$, and for $\lambda_0$ we get $v_0 = \begin{bmatrix}0 \\0 \\1 \\\end{bmatrix}$.
 So the the first and second principal components of M are $\begin{bmatrix}1 \\1 \\0 \\\end{bmatrix}$ and $\begin{bmatrix}1 \\-1 \\0 \\\end{bmatrix}$, since $\lambda_2 > \lambda_1 >\lambda_0$.
+
+
+## Question 3: K-means Clustering
+
+### 1.
+By randomizing the centers for every iterations until they converge into clusters, we avoid the problem of high dependence of the initial conditions. The randomization stops once the new centers are the same as the old centers.
+
+### 2.
+Solutions can be found in the file 'k_means.py'.
+### 3.
+The cost function decreases as K increases because we are essentially fitting the data in more clusters, at the limit we will put every single data point in it's own small cluster, this will decrease the cost function until there is essentially no error. This is over fitting, because having only single point clusters does not have any statistical significance. 
