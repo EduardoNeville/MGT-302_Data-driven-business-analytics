@@ -57,10 +57,20 @@ def mutual_information(x, y):
     ############################################################################
     # Replace "..." with your code
 
-    joint_prob = np.histogram2d(x, y, bins=len(np.unique(y)))[0] / len(y)
-    x_prob = np.sum(joint_prob, axis=1)
-    y_prob = np.sum(joint_prob, axis=0)
-    res = np.sum(joint_prob * np.nan_to_num(np.log2(joint_prob / np.outer(x_prob, y_prob))))
+    # Calculate the probability distributions
+    px = np.bincount(x) / len(x)
+    py = np.bincount(y) / len(y)
+    pxy = np.histogram2d(x, y, bins=2)[0] / len(x)
+
+    # Calculate the mutual information
+    mutual_info = 0
+
+    for i in range(2):
+        for j in range(2):
+            if pxy[i, j] > 0 and px[i] > 0 and py[j] > 0:
+                mutual_info += pxy[i, j] * np.log2(pxy[i, j] / (px[i] * py[j]))
+
+    res = mutual_info
 
     ############################################################################
     #                               END OF YOUR CODE                           #
@@ -130,23 +140,29 @@ def best_split(x, y):
     ############################################################################
     # Replace "..." with your code
 
-    # Initialize the best score
-    best_score = -np.inf
-    split_id = -1
+    best_score = -float('inf')
+    split_id = None
     split_threshold = None
-    for feature_idx in range(x.shape[1]):
-        feature_values = np.unique(x[:, feature_idx])
-        for threshold in feature_values:
-            left_mask = x[:, feature_idx] <= threshold
-            right_mask = ~left_mask
-            left_y = y[left_mask]
-            right_y = y[right_mask]
-            if len(left_y) == 0 or len(right_y) == 0:
+
+    for feature_id in range(x.shape[1]):
+        x_col = x[:, feature_id]
+
+        unique_values = np.unique(x_col)
+        thresholds = (unique_values[:-1] + unique_values[1:]) / 2
+
+        for threshold in thresholds:
+            left_ids, right_ids = split(x_col, threshold)
+            if len(left_ids) == 0 or len(right_ids) == 0:
                 continue
-            score = mutual_information(left_y, right_y)
-            if score > best_score:
-                best_score = score
-                split_id = feature_idx
+            
+            x_left, y_left = x[left_ids], y[left_ids]
+            x_right, y_right = x[right_ids], y[right_ids]
+            
+            info_gain = mutual_information(y, np.concatenate((y_left, y_right)))
+            
+            if info_gain > best_score:
+                best_score = info_gain
+                split_id = feature_id
                 split_threshold = threshold
 
     ############################################################################
@@ -178,8 +194,8 @@ print(f"The entropy from your code is: {y_entropy}")
 print("Correct value of the entropy: 0.9942")
 
 # |%%--%%| <WiZvaAd5ho|rCFyBWxJTN>
-### Test for split
 
+### Test for split
 col = 0
 x_col = x[:, col]
 threshold = 54
@@ -285,8 +301,8 @@ print(f"Accuracy: {acc}")
 print(f"F1 score: {f1}")
 
 # |%%--%%| <MpoOBjSJJl|X2KXI0A1dw>
-
 # Replace "..." with your code
+
 # Visualization of the decision tree
 # Hint: search for the sklearn methods to export your tree as a jpeg file
 plt.figure(figsize=(30, 12))
