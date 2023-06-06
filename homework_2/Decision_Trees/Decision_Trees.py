@@ -1,6 +1,5 @@
 r"""°°°
 # Data driven business analytics - Homework 2
-
 °°°"""
 # |%%--%%| <d96Om2YRdK|nToDWKuXQS>
 r"""°°°
@@ -57,20 +56,16 @@ def mutual_information(x, y):
     ############################################################################
     # Replace "..." with your code
 
-    # Calculate the probability distributions
-    px = np.bincount(x) / len(x)
-    py = np.bincount(y) / len(y)
-    pxy = np.histogram2d(x, y, bins=2)[0] / len(x)
+    # Compute the entropy of y
+    H_y = entropy(y)
+    H_y_x = 0
 
-    # Calculate the mutual information
-    mutual_info = 0
+    # Compute the entropy of y given x
+    for i in np.unique(x):
+        H_y_x += entropy(y[x == i]) * np.sum(x == i) / len(x)
 
-    for i in range(2):
-        for j in range(2):
-            if pxy[i, j] > 0 and px[i] > 0 and py[j] > 0:
-                mutual_info += pxy[i, j] * np.log2(pxy[i, j] / (px[i] * py[j]))
-
-    res = mutual_info
+    # Compute the mutual information
+    res = H_y - H_y_x
 
     ############################################################################
     #                               END OF YOUR CODE                           #
@@ -140,30 +135,23 @@ def best_split(x, y):
     ############################################################################
     # Replace "..." with your code
 
-    best_score = -float('inf')
-    split_id = None
-    split_threshold = None
+    # Initialize the best score
+    best_score = 0
+    split_id = 0
+    split_threshold = 0
 
-    for feature_id in range(x.shape[1]):
-        x_col = x[:, feature_id]
+    # Iterate through all possible features
+    for i in range(x.shape[1]):
+        # Iterate through all possible thresholds
+        for t in np.unique(x[:,i]):
+            # Compute the mutual information
+            score = mutual_information(x[:,i] <= t, y)
+            # Update the best score and the best threshold
+            if score > best_score:
+                best_score = score
+                split_id = i
+                split_threshold = t
 
-        unique_values = np.unique(x_col)
-        thresholds = (unique_values[:-1] + unique_values[1:]) / 2
-
-        for threshold in thresholds:
-            left_ids, right_ids = split(x_col, threshold)
-            if len(left_ids) == 0 or len(right_ids) == 0:
-                continue
-            
-            x_left, y_left = x[left_ids], y[left_ids]
-            x_right, y_right = x[right_ids], y[right_ids]
-            
-            info_gain = mutual_information(y, np.concatenate((y_left, y_right)))
-            
-            if info_gain > best_score:
-                best_score = info_gain
-                split_id = feature_id
-                split_threshold = threshold
 
     ############################################################################
     #                               END OF YOUR CODE                           #
@@ -196,6 +184,7 @@ print("Correct value of the entropy: 0.9942")
 # |%%--%%| <WiZvaAd5ho|rCFyBWxJTN>
 
 ### Test for split
+
 col = 0
 x_col = x[:, col]
 threshold = 54
@@ -301,8 +290,8 @@ print(f"Accuracy: {acc}")
 print(f"F1 score: {f1}")
 
 # |%%--%%| <MpoOBjSJJl|X2KXI0A1dw>
-# Replace "..." with your code
 
+# Replace "..." with your code
 # Visualization of the decision tree
 # Hint: search for the sklearn methods to export your tree as a jpeg file
 plt.figure(figsize=(30, 12))
