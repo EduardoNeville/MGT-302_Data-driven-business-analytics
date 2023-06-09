@@ -1,207 +1,169 @@
 r"""°°°
-# Homework 3 
-
-#### EDUARDO NEVILLE
-#### Åke Jason 
+#### Homework 3 
+#### Eduardo Neville & Åke Janson 
 #### Spring 2023
 °°°"""
-# |%%--%%| <ep587P0Rao|WEywxXdf3w>
+# |%%--%%| <8ug8iJERAw|auHIgrYM8r>
 r"""°°°
-    ## First we import the corresponding packages for the assignment
-    ## We then shall download the data from the .xlsx file 
+###### We import the packages to the jupyter notebook 
 °°°"""
-# |%%--%%| <WEywxXdf3w|UjgKPQnvTc>
+# |%%--%%| <auHIgrYM8r|hpkAUU8CtG>
 
 import numpy as np
-import pandas as pd 
 from scipy.stats import norm 
 from sklearn.linear_model import LinearRegression, Ridge, Lasso, RidgeCV, LassoCV
 from sklearn.model_selection import train_test_split, validation_curve
 from sklearn.metrics import mean_squared_error as mse
 import matplotlib.pyplot as plt
+import pandas as pd
 
 
-# |%%--%%| <UjgKPQnvTc|bmVLc57JKg>
+#|%%--%%| <hpkAUU8CtG|MYyXbziN3W>
+r"""°°°
+We then import the excel file and create a dataframe 
+°°°"""
+# |%%--%%| <MYyXbziN3W|uKs6tXPgkW>
 
-#read data from Excel
-#enter your own folder with the data file here
+#read the excel file
 data = pd.read_excel(r'data.xlsx') 
 df = pd.DataFrame(data, columns = ['NESN SW', 'ROG SW', 'NOVN SW', 'EURUSD', 'CHFUSD'])
-df.head()
-
-
-#|%%--%%| <bmVLc57JKg|l9QbvEvSsg>
-
-#calculate single asset and portfolio returns 
-def getReturns(df): 
-    # Creating a new dataframe with the returns
-    returns = df.apply(lambda x: x.pct_change(1).dropna().reset_index(drop=True)) 
-    returns['Portfolio CHF'] = returns['NESN SW']/3 + returns['ROG SW']/3 + returns['NOVN SW']/3 
-    returns['Portfolio USD'] = returns['Portfolio CHF'] + returns['CHFUSD'] + returns['Portfolio CHF']*returns['CHFUSD'] 
-    return returns 
-
+print(df.head())
+# show the growth of the assets
 plt.plot(df)
+plt.legend(df.columns)
 
+#|%%--%%| <uKs6tXPgkW|XszYvdJwiJ>
+r"""°°°
+We then print the daily simple returns of each asset
+°°°"""
+#|%%--%%| <XszYvdJwiJ|ZAHVXm87Ms>
 
-# |%%--%%| <l9QbvEvSsg|Q2xjnU6eVZ>
+#calculate the daily simple returns
+def percentage_change(df):
+    returns = df.apply(lambda x: x.pct_change(1).dropna().reset_index(drop=True)) 
+    return returns
 
-#simulate the data set
-
-#generate a matrix of size 100 x 10 of standard normally distributed numbers
-X = np.random.standard_normal(size=(n_simul, n_pred))
-
-#generate a vector of size 100 x 1 of standard normally distributed numbers
-Y = np.random.standard_normal(size=(n_simul, 1))
-
-# split the data into training and test set based on the input above
-X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size = test_size)
-
-# |%%--%%| <Q2xjnU6eVZ|eonAzhsTfV>
-
-#initialize the mse_train variable
-mse_train = np.zeros((n_pred + 1, 1))
-
-#input the empty model and train the regression on a vector of zeros and as target variable Y train
-reg = LinearRegression().fit(np.zeros((len(Y_train), 1)), Y_train)
-
-#predict on the train set again with a vector of zeros
-pred = reg.predict(np.zeros((len(Y_train), 1)))
-
-#calculate the mean squared error of the prediction and Y train
-mse_train[0] = mse(pred, Y_train)
-
-#repeat the above procedure with an increasing number of predictors
-for i in range(1, n_pred + 1):
-    reg = LinearRegression().fit(X_train[:, :i], Y_train)
-    pred = reg.predict(X_train[:, :i])
-    mse_train[i] = mse(pred, Y_train)
-
-# |%%--%%| <eonAzhsTfV|0NFqhAIPb0>
-
-#initialize the mse_test variable
-mse_test = np.zeros((n_pred + 1, 1))
-
-#evaluate the empty model
-reg = LinearRegression().fit(np.zeros((len(Y_train), 1)), Y_train)
-
-#now predict on the test set
-pred = reg.predict(np.zeros((len(Y_train), 1)))
-
-#evaluate the prediction on the test set
-mse_test[0] = mse(pred, Y_test)
-
-#train the model on the train set and evaluate prediction on the test set
-for i in range(1, n_pred + 1):
-    reg = LinearRegression().fit(X_train[:, :i], Y_train) 
-    pred = reg.predict(X_test[:, :i])
-    mse_test[i] = mse(pred, Y_test)
-
-# |%%--%%| <0NFqhAIPb0|dwjDwaBZUy>
-
-#plot the train and test mean squared errors (MSEs)
-plt.plot(mse_train, 'r--', label='Train')
-plt.plot(mse_test, 'g--', label='Test')
-plt.xlabel('Number of regressors')
-plt.ylabel('MSE')
-plt.legend(loc='upper left')
+#apply the function to the dataframe
+plt.plot(percentage_change(df))
+plt.legend(df.columns)
 plt.show()
 
-# |%%--%%| <dwjDwaBZUy|IY39sRbsNf>
+#|%%--%%| <ZAHVXm87Ms|9U1twcRPDN>
 
-#set the array of penalization parameters on which the two models will be tested
-alphas = np.logspace(-4, 5, 100, endpoint=True, base=10.0)
+#calculate VaR and ES given the historical simulation method
+def getVaR_ES(alpha, sorted_returns):
+    index = int(np.ceil(alpha*(len(sorted_returns))))
+    VaR = sorted_returns.apply(lambda x: -x[index])
+    ES = sorted_returns.apply(lambda x: -x[:index].mean())
+    return VaR, ES
 
-# |%%--%%| <IY39sRbsNf|TIi8j813sv>
+#|%%--%%| <9U1twcRPDN|WeiZ6cYlam>
 
-#shrinkage with the Ridge regression
+#calculate returns, sort them, and calculate the VaR and ES (historical simulation method)
+def var_esHist(alpha, df): 
+    returns = percentage_change(df) 
+    sorted_returns = returns.apply(lambda x: x.sort_values().reset_index(drop=True)) 
+    return getVaR_ES(alpha, sorted_returns)
 
-#use the function validation curve to produce the mse on the all the training folds and the single validation fold
-train_scores_ridge, test_scores_ridge = validation_curve(Ridge(), X, Y, scoring = 'neg_mean_squared_error', param_name = 'alpha', param_range = alphas, cv = K_Folds)
 
-#train another ridge cross validated model to access the best alpha
-ridge = RidgeCV(alphas = alphas, cv = K_Folds, fit_intercept=False).fit(X, np.ravel(Y))
+#|%%--%%| <WeiZ6cYlam|SHYnG8Jp6f>
 
-#this is the alpha chosen by python whcih works best for the model
-ridge_alpha = ridge.alpha_
+var_esHist(0.1,df), var_esHist(0.01,df), var_esHist(0.001,df)
 
-#calculate the mean of the mse scores on the initially specified number of folds
-train_scores_mean_ridge = np.mean(train_scores_ridge, axis=1)
-test_scores_mean_ridge = np.mean(test_scores_ridge, axis=1)
+#|%%--%%| <SHYnG8Jp6f|dRK6bs7d47>
 
-# |%%--%%| <TIi8j813sv|B6EojUuhuW>
+#analytical computation of Value at Risk for a normally distributed random variable
+def varNorm(mu, sigma, alpha):
+    quantile = norm.ppf(alpha)
+    return -mu - sigma*quantile
 
-#shrinkage with the Lasso regression
+# |%%--%%| <dRK6bs7d47|t05FvEJKj8>
 
-#use the function validation curve to produce the mse on the all the training folds and the single validation fold
-train_scores_lasso, test_scores_lasso = validation_curve(Lasso(), X, Y, scoring = 'neg_mean_squared_error', param_name = 'alpha', param_range = alphas, cv = K_Folds)
+#analytical computation of Expected Shortfall for a normally distributed random variable
+def esNorm(mu, sigma, alpha):
+    quantile = norm.ppf(alpha)
+    return -mu + sigma/alpha*norm.pdf(quantile)
 
-#train another ridge cross validated model to access the best alpha
-#lasso = LassoCV(alphas = alphas, cv = K_Folds).fit(X, Y)
-lasso = LassoCV(alphas = alphas, cv = K_Folds, fit_intercept=False).fit(X, np.ravel(Y))
+# |%%--%%| <t05FvEJKj8|XZiFPcmFDN>
+r"""°°°
+# Monte Carlo Simulation
+°°°"""
+# |%%--%%| <XZiFPcmFDN|5MlVqSiMpR>
 
-#this is the alpha chosen by python whcih works best for the model
-lasso_alpha = lasso.alpha_
+#Monte Carlo simulation method: Value at Risk for a normally distributed random variable
+def varNormMC(mu, sigma, alpha, numSim):
+    simulatedSample = np.random.normal(loc=mu, scale=sigma, size=numSim)
+    return -np.quantile(simulatedSample, alpha)
 
-#calculate the mean of the mse scores on the initially specified number of folds
-train_scores_mean_lasso = np.mean(train_scores_lasso, axis=1)
-test_scores_mean_lasso = np.mean(test_scores_lasso, axis=1)
+# |%%--%%| <5MlVqSiMpR|UG4twI70Ub>
 
-# |%%--%%| <B6EojUuhuW|zQPcYnq15a>
+#Monte Carlo simulation method: Expected Shortfall for a normally distributed random variable
+def esNormMC(mu, sigma, alpha, numSim):
+    simulatedSample = np.random.normal(loc=mu, scale=sigma, size=numSim)
+    sortedSample = np.sort(simulatedSample)
+    index = int(np.ceil(numSim*alpha))
+    return -np.average(sortedSample[0:index])
 
-#plot the cross-validated MSE curves for ridge and lasso
-plt.plot(alphas, test_scores_mean_ridge, 'r--', label='Ridge')
-plt.plot(alphas, test_scores_mean_lasso, 'g--', label='Lasso')
-plt.xscale('log')
-plt.xlabel('Penalization parameter')
-plt.ylabel('MSE')
-plt.legend(loc='upper left')
-plt.show()
-ridge_alpha, lasso_alpha
+# |%%--%%| <UG4twI70Ub|RAPCQCe9qY>
 
-# |%%--%%| <zQPcYnq15a|bJgWLq6myM>
+mu, sigma, alpha = 0.04, 0.15, 0.01
+varNorm(mu, sigma, alpha), esNorm(mu, sigma, alpha)
 
-#initialize the ridge_coefs variable
-ridge_coefs = []
+# |%%--%%| <RAPCQCe9qY|UY1zBTaq7H>
 
-#save the value of the ridge regression coefficients for each penalization parameter alpha
-for a in alphas:
-    ridge = Ridge(alpha=a, fit_intercept=False)
-    ridge.fit(X, Y)
-    ridge_coefs.append(np.ravel(ridge.coef_))
+numSim = 1000
+varNormMC(mu, sigma, alpha, numSim), esNormMC(mu, sigma, alpha, numSim)
 
-# |%%--%%| <bJgWLq6myM|nbDWWqleMy>
+#|%%--%%| <UY1zBTaq7H|vmz74hkNix>
 
-#initialize the lasso_coefs variable
-lasso_coefs = []
+#bootstrapped distribution of MC computed Value at Risk and Expected Shortfall for a Gaussian random variable
+def bootstrapNormVaRES(mu, sigma, alpha, numSim, numBootstraps, numBins):
+    varDistribution = np.empty(numBootstraps)
+    esDistribution = np.empty(numBootstraps)
+    for i in range(numBootstraps):
+        varDistribution[i] = varNormMC(mu, sigma, alpha, numSim)
+        esDistribution[i] = esNormMC(mu, sigma, alpha, numSim)
+    plt.hist(varDistribution, numBins)
+    plt.legend(['VaR'])
+    plt.title("Value at Risk distribution with alpha {} and {} simulations".format(alpha, numSim))
+    plt.show()
+    plt.hist(esDistribution, numBins)
+    plt.legend(['ES'])
+    plt.title("Expected Shortfall distribution with alpha {} and {} simulations".format(alpha, numSim))
+    plt.show()
 
-#save the value of the lasso regression coefficients for each penalization parameter alpha
-for a in alphas:
-    lasso = Lasso(alpha=a, fit_intercept=False)
-    lasso.fit(X, Y)
-    lasso_coefs.append(np.ravel(lasso.coef_))
+# |%%--%%| <vmz74hkNix|Nl8nYWIrFs>
 
-# |%%--%%| <nbDWWqleMy|PdtiMbdjbZ>
+numSim = 100
+numBootstraps = 1000
+numBins = 30
+alpha = 0.05
+bootstrapNormVaRES(mu, sigma, alpha, numSim, numBootstraps, numBins)
+numSim = 10000
+bootstrapNormVaRES(mu, sigma, alpha, numSim, numBootstraps, numBins)
 
-#plot the ridge regression coefficients in dependence of the penalization parameter alpha
-ax = plt.gca()
-ax.plot(alphas, ridge_coefs)
-ax.set_xscale("log")
-plt.xlabel('Penalization parameter')
-plt.ylabel('Coefficients')
-plt.title('Ridge coefficients as a function of regularization')
-plt.show()
+# |%%--%%| <Nl8nYWIrFs|bGQN0PylgC>
 
-# |%%--%%| <PdtiMbdjbZ|IjgC5vnXHj>
+#calculate returns, fit a univariate normal distribution, and calculate VaR and ES given the variance-covariance method under Gaussianity
+def var_esVarCovNorm(alpha, df): 
+    returns = percentage_change(df) 
+    moments = returns.apply(lambda x: norm.fit(x)) 
+    return moments.apply(lambda x: varNorm(x[0], x[1], alpha)), moments.apply(lambda x: esNorm(x[0], x[1], alpha)) 
 
-#plot the lasso regression coefficients in dependence of the penalization parameter alpha
-ax = plt.gca()
-ax.plot(alphas, lasso_coefs)
-ax.set_xscale("log")
-plt.xlabel('Penalization parameter')
-plt.ylabel('Coefficients')
-plt.title('Lasso coefficients as a function of regularization')
-plt.show()
+# |%%--%%| <bGQN0PylgC|h75XzLVT0k>
 
-# |%%--%%| <IjgC5vnXHj|mopB7QcL20>
+var_esVarCovNorm(0.1, df), var_esVarCovNorm(0.01, df), var_esVarCovNorm(0.001, df) 
+
+# |%%--%%| <h75XzLVT0k|9MINCGPCgO>
+
+#difference between the historical simulation and the variance-covariance (Gaussian-based) estimation
+print(var_esHist(0.1,df)[0]-var_esVarCovNorm(0.1, df)[0])
+print(var_esHist(0.1,df)[1]-var_esVarCovNorm(0.1, df)[1])
+print(var_esHist(0.01,df)[0]-var_esVarCovNorm(0.01, df)[0]) 
+print(var_esHist(0.01,df)[1]-var_esVarCovNorm(0.01, df)[1])
+print(var_esHist(0.001,df)[0]-var_esVarCovNorm(0.001, df)[0])
+print(var_esHist(0.001,df)[1]-var_esVarCovNorm(0.001, df)[1])
+
+
 
 
